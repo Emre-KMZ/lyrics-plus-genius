@@ -773,3 +773,22 @@ div.lyrics-tabBar-headerItemLink {
 	line-height: 1.2em;
 	/* color: var(--lyrics-color-inactive); */
 }
+
+/* Local popover replacing Spotify's ContextMenu (broken on Spotify 1.3.8) */
+.lyrics-popover {
+	position: relative;
+}
+.lyrics-popover-menu {
+	position: absolute;
+	bottom: calc(100% + 8px);
+	right: 0;
+	z-index: 100;
+	min-width: 320px;
+	max-height: 60vh;
+	overflow-y: auto;
+	padding: 8px 12px;
+	border-radius: 6px;
+	background: var(--spice-card, #282828);
+	color: var(--spice-text, #fff);
+	box-shadow: 0 16px 24px rgba(0, 0, 0, 0.3);
+}

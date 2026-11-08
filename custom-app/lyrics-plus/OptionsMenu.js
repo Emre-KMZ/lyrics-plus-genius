@@ -303,10 +303,10 @@ const TranslationMenu = react.memo(({ friendlyLanguage, hasTranslation, musixmat
 				className: "lyrics-tooltip-wrapper",
 			},
 			react.createElement(
-				Spicetify.ReactComponent.ContextMenu,
+				PopoverMenu,
 				{
 					menu: react.createElement(
-						Spicetify.ReactComponent.Menu,
+						"div",
 						{},
 						react.createElement("h3", null, " Conversions"),
 						react.createElement(OptionList, {
@@ -378,10 +378,10 @@ const AdjustmentsMenu = react.memo(({ mode, hasPerformer }) => {
 				className: "lyrics-tooltip-wrapper",
 			},
 			react.createElement(
-				Spicetify.ReactComponent.ContextMenu,
+				PopoverMenu,
 				{
 					menu: react.createElement(
-						Spicetify.ReactComponent.Menu,
+						"div",
 						{},
 						react.createElement("h3", null, " Adjustments"),
 						react.createElement(OptionList, {
@@ -464,3 +464,22 @@ const AdjustmentsMenu = react.memo(({ mode, hasPerformer }) => {
 		)
 	);
 });
+
+// Local replacement for Spicetify.ReactComponent.ContextMenu, which crashes on Spotify 1.3.8
+// ("createElementNS is not a function"). Renders the menu inline and toggles it on click.
+function PopoverMenu({ menu, children }) {
+	const [open, setOpen] = react.useState(false);
+	const ref = react.useRef(null);
+	react.useEffect(() => {
+		if (!open) return;
+		const onDown = (e) => ref.current && !ref.current.contains(e.target) && setOpen(false);
+		document.addEventListener("mousedown", onDown);
+		return () => document.removeEventListener("mousedown", onDown);
+	}, [open]);
+	return react.createElement(
+		"div",
+		{ ref, className: "lyrics-popover" },
+		react.cloneElement(children, { onClick: () => setOpen((o) => !o), "aria-expanded": open }),
+		open && react.createElement("div", { className: "lyrics-popover-menu", role: "menu" }, menu)
+	);
+}
