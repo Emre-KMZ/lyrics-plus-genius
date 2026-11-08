@@ -1,0 +1,9 @@
+{
+	"manifest_version": 3,
+	"name": "Genius Bridge for Lyrics Plus",
+	"version": "1.0.0",
+	"description": "Loads Genius lyrics with your own Chrome and hands them to Lyrics Plus in Spotify through a local bridge.",
+	"background": { "service_worker": "background.js" },
+	"permissions": ["alarms"],
+	"host_permissions": ["https://genius.com/*", "http://127.0.0.1:47123/*"]
+}

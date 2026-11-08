@@ -1,0 +1,9 @@
+{
+	"name": "lyrics-plus-genius",
+	"private": true,
+	"description": "Genius lyrics in Spotify's Lyrics Plus, loaded through your own Chrome",
+	"license": "LGPL-2.1-only",
+	"scripts": {
+		"test": "node --test bridge/bridge.test.mjs"
+	}
+}
