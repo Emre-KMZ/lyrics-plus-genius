@@ -916,7 +916,7 @@ const GeniusPage = react.memo(
 			null,
 			react.createElement(VersionSelector, { items: versions, index: versionIndex, callback: onVersionChange }),
 			react.createElement("div", {
-				className: "lyrics-lyricsContainer-LyricsLine lyrics-lyricsContainer-LyricsLine-active",
+				className: "lyrics-lyricsContainer-LyricsLine lyrics-lyricsContainer-LyricsLine-active lyrics-Genius-lyrics",
 				ref: (c) => {
 					container = c;
 				},
@@ -942,7 +942,7 @@ const GeniusPage = react.memo(
 				null,
 				react.createElement(VersionSelector, { items: versions, index: versionIndex2, callback: onVersionChange2 }),
 				react.createElement("div", {
-					className: "lyrics-lyricsContainer-LyricsLine lyrics-lyricsContainer-LyricsLine-active",
+					className: "lyrics-lyricsContainer-LyricsLine lyrics-lyricsContainer-LyricsLine-active lyrics-Genius-lyrics",
 					ref: (c) => {
 						container2 = c;
 					},

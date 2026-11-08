@@ -402,7 +402,6 @@ const ServiceOption = ({ item, onToggle, onSwap, isFirst = false, isLast = false
 	);
 
 	const toggleActive = useCallback(() => {
-		if (item.name === "genius" && spotifyVersion >= "1.2.31") return;
 		const state = !active;
 		setActive(state);
 		onToggle(item.name, state);

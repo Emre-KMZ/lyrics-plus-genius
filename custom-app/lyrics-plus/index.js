@@ -6,7 +6,6 @@
 const react = Spicetify.React;
 const { useState, useEffect, useCallback, useMemo, useRef } = react;
 /** @type {import("react").ReactDOM} */
-const spotifyVersion = Spicetify.Platform.version;
 
 // Define a function called "render" to specify app entry point
 // This function will be used to mount app to main view.
@@ -94,8 +93,8 @@ const CONFIG = {
 			modes: [KARAOKE, SYNCED, UNSYNCED],
 		},
 		genius: {
-			on: spotifyVersion >= "1.2.31" ? false : getConfig("lyrics-plus:provider:genius:on"),
-			desc: "Provide unsynced lyrics with insights from artists themselves. Genius is disabled and cannot be used as a provider on <code>1.2.31</code> and higher.",
+			on: getConfig("lyrics-plus:provider:genius:on"),
+			desc: "Provide unsynced lyrics with insights from artists themselves. Loaded by your Chrome through the local bridge (Chrome must be open).",
 			modes: [GENIUS],
 		},
 		local: {
@@ -443,7 +442,6 @@ class LyricsContainer extends react.Component {
 		let finalData = { ...emptyState, uri: trackInfo.uri };
 		for (const id of CONFIG.providersOrder) {
 			const service = CONFIG.providers[id];
-			if (spotifyVersion >= "1.2.31" && id === "genius") continue;
 			if (!service.on) continue;
 			if (mode !== -1 && !service.modes.includes(mode)) continue;
 
@@ -1125,7 +1123,8 @@ class LyricsContainer extends react.Component {
 		const friendlyLanguage = lang && new Intl.DisplayNames(["en"], { type: "language" }).of(lang.split("-")[0])?.toLowerCase();
 		const hasMusixmatchLanguages = Array.isArray(this.state.musixmatchAvailableTranslations) && this.state.musixmatchAvailableTranslations.length > 0;
 		const hasTranslation = this.state.neteaseTranslation !== null || this.state.musixmatchTranslation !== null || hasMusixmatchLanguages;
-		const hasPerformer = !!this.state.currentLyrics?.some((line) => line.performer);
+		// Genius lyrics are an HTML string, not an array of lines.
+		const hasPerformer = Array.isArray(this.state.currentLyrics) && this.state.currentLyrics.some((line) => line.performer);
 		const romanizationLines = this.state.pinyin?.mode === mode ? this.state.pinyin.lines : null;
 
 		if (mode !== -1) {

@@ -164,6 +164,11 @@
 	text-decoration: underline;
 }
 
+/* Genius lyrics are one block; only the annotation links get a hover underline. */
+.lyrics-lyricsContainer-UnsyncedLyricsPage .lyrics-Genius-lyrics:hover {
+	text-decoration: none;
+}
+
 .lyrics-lyricsContainer-SyncedLyrics .lyrics-lyricsContainer-LyricsLine {
 	color: var(--lyrics-color-inactive);
 }

@@ -20,13 +20,13 @@ const ProviderGenius = (() => {
 	}
 
 	async function getNote(id) {
-		const body = await Spicetify.CosmosAsync.get(`https://genius.com/api/annotations/${id}`);
+		const body = await getJSON(`https://genius.com/api/annotations/${id}`);
 		const response = body.response;
 		let note = "";
 
 		// Authors annotations
 		if (response.referent && response.referent.classification === "verified") {
-			const referentsBody = await Spicetify.CosmosAsync.get(`https://genius.com/api/referents/${id}`);
+			const referentsBody = await getJSON(`https://genius.com/api/referents/${id}`);
 			const referents = referentsBody.response;
 			for (const ref of referents.referent.annotations) {
 				note += getChildDeep(ref.body.dom);
@@ -47,20 +47,23 @@ const ProviderGenius = (() => {
 		return note;
 	}
 
-	function fetchHTML(url) {
-		return new Promise((resolve, reject) => {
-			const request = JSON.stringify({
-				method: "GET",
-				uri: url,
-			});
+	// Genius blocks requests from Spotify, so genius.com pages are loaded by the user's Chrome
+	// through a local bridge (see bridge/ and extension/ in this repo).
+	const BRIDGE = "http://127.0.0.1:47123";
 
-			window.sendCosmosRequest({
-				request,
-				persistent: false,
-				onSuccess: resolve,
-				onFailure: reject,
-			});
-		});
+	async function viaBridge(url, mode) {
+		const res = await fetch(`${BRIDGE}/genius?${new URLSearchParams({ url, mode })}`);
+		const data = await res.json();
+		if (data.error) throw new Error(data.error);
+		return data.text;
+	}
+
+	async function getJSON(url) {
+		return JSON.parse(await viaBridge(url, "text"));
+	}
+
+	async function fetchHTML(url) {
+		return JSON.stringify({ body: await viaBridge(url, "html") });
 	}
 
 	async function fetchLyricsVersion(results, index) {
@@ -80,6 +83,11 @@ const ProviderGenius = (() => {
 		const parser = new DOMParser();
 		const htmlDoc = parser.parseFromString(body, "text/html");
 		const lyricsDiv = htmlDoc.querySelectorAll('div[data-lyrics-container="true"]');
+
+		// Genius puts a header (contributors, info icon) inside the first container and marks it as not part of the lyrics.
+		for (const el of htmlDoc.querySelectorAll('div[data-lyrics-container="true"] [data-exclude-from-selection="true"]')) {
+			el.remove();
+		}
 
 		for (const i of lyricsDiv) {
 			lyrics += `${i.innerHTML}<br>`;
@@ -107,7 +115,7 @@ const ProviderGenius = (() => {
 			const query = new URLSearchParams({ per_page: 20, q: `${info.artist} ${title}` });
 			const url = `https://genius.com/api/search/song?${query.toString()}`;
 
-			const geniusSearch = await Spicetify.CosmosAsync.get(url);
+			const geniusSearch = await getJSON(url);
 
 			hits = geniusSearch.response.sections[0].hits.map((item) => ({
 				title: item.result.full_title,
